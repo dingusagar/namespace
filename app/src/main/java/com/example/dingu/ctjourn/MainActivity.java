@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,6 +24,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -84,48 +87,35 @@ public class MainActivity extends AppCompatActivity {
 
         ) {
             @Override
-            protected void populateViewHolder(final PostViewHolder viewHolder, Post model, int position) {
+            protected void populateViewHolder(final PostViewHolder viewHolder, final Post model, int position) {
                 final String postKey = getRef(position).getKey();
 
                 viewHolder.setTitle(model.getTitle());
                 viewHolder.setDesc(model.getDesc());
                 viewHolder.setImage(getApplicationContext(),model.getVideo());
-                viewHolder.setUserName(model.getUserName());
-                viewHolder.setLikeButton(postKey);
+                viewHolder.setUserName(model.getUsername());
+//                viewHolder.setUpvoteButton(postKey);
 
-
-                View.OnClickListener likeButtonListener =  new View.OnClickListener() {
+                View.OnClickListener listener = new View.OnClickListener() {
                     @Override
-                    public void onClick(View view) {
-                        mProcessLike = true;
-                        mDatabaseLike.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                if(mProcessLike)
-                                {
-                                    if(dataSnapshot.child(postKey).hasChild((mAuth.getCurrentUser().getUid())))
-                                    {
-                                        mDatabaseLike.child(postKey).child(mAuth.getCurrentUser().getUid()).removeValue();
-                                        mProcessLike = false;
+                    public void onClick(View v) {
+                        HashMap<String,Integer> votes = model.getVotes();
 
-                                    }
-                                    else
-                                    {
-                                        mDatabaseLike.child(postKey).child(mAuth.getCurrentUser().getUid()).setValue("LIKED");
-                                        mProcessLike = false;
-
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
+                        if(v.getId() == R.id.upvote)
+                        {
+                            votes.put(mAuth.getCurrentUser().getUid().toString(),1);
+                            model.setVotes(votes);
+                            myDBRef.child(""+model.getPostID()).setValue(model);
+                        }else if(v.getId() == R.id.downvote)
+                        {
+                            votes.put(mAuth.getCurrentUser().getUid().toString(),-1);
+                            model.setVotes(votes);
+                            myDBRef.child(""+model.getPostID()).setValue(model);
+                        }
                     }
                 };
-                viewHolder.likeButton.setOnClickListener(likeButtonListener);
+
+                viewHolder.upvoteButton.setOnClickListener(listener);
             }
         };
         postList.setAdapter(firebaseRecyclerAdapter);
@@ -174,13 +164,16 @@ public class MainActivity extends AppCompatActivity {
     public static class PostViewHolder extends RecyclerView.ViewHolder{
 
         View mView;
-        ImageButton likeButton;
+        ImageButton upvoteButton;
+        ImageButton downVoteButton;
         DatabaseReference mDatabaseRef;
         FirebaseAuth newAuth;
         public PostViewHolder(View itemView) {
             super(itemView);
             mView = itemView;
-            likeButton =(ImageButton) mView.findViewById(R.id.like_button);
+            upvoteButton =(ImageButton) mView.findViewById(R.id.upvote);
+            downVoteButton = (ImageButton)mView.findViewById(R.id.downvote);
+
             mDatabaseRef = FirebaseDatabase.getInstance().getReference().child("Likes");
             newAuth = FirebaseAuth.getInstance();
             mDatabaseRef.keepSynced(true);
@@ -210,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
             post_username.setText("posted by "+userName);
         }
 
-        public void setLikeButton(final String postKey)
+        public void setUpvoteButton(final String postKey)
         {
             mDatabaseRef.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -219,11 +212,37 @@ public class MainActivity extends AppCompatActivity {
                     if (newAuth.getCurrentUser() != null) {
                         if(dataSnapshot.child(postKey).hasChild(newAuth.getCurrentUser().getUid()))
                         {
-                            likeButton.setImageResource(R.mipmap.blue_like);
+                            upvoteButton.setImageResource(R.mipmap.blue_like);
                         }
                         else
                         {
-                            likeButton.setImageResource(R.mipmap.grey_like);
+                            upvoteButton.setImageResource(R.mipmap.grey_like);
+                        }
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+        public void setDownVoteButton(final String postKey)
+        {
+            mDatabaseRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    boolean userLoggedIn ;
+                    if (newAuth.getCurrentUser() != null) {
+                        if(dataSnapshot.child(postKey).hasChild(newAuth.getCurrentUser().getUid()))
+                        {
+                            downVoteButton.setImageResource(R.mipmap.blue_like);
+                        }
+                        else
+                        {
+                            downVoteButton.setImageResource(R.mipmap.grey_like);
                         }
                     }
 

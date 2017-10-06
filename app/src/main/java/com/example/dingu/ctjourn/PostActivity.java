@@ -59,7 +59,12 @@ public class PostActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseUser mCurrentUser;
     private static final int REQUEST_TAKE_GALLERY_VIDEO = 1;
-    private DatabaseReference mDatabaseUser;
+    private DatabaseReference mDatabaseUser,dbLastPostIDRef;
+
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +73,7 @@ public class PostActivity extends AppCompatActivity {
         mCurrentUser= mAuth.getCurrentUser();
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference().child("Post");
+        dbLastPostIDRef = firebaseDatabase.getReference().child("lastPostID");
         mDatabaseUser = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrentUser.getUid());
         myStorageRef = FirebaseStorage.getInstance().getReference();
 
@@ -129,11 +135,24 @@ public class PostActivity extends AppCompatActivity {
                     mDatabaseUser.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            newPost.child("Title").setValue(title);
-                            newPost.child("Desc").setValue(desc);
-                            newPost.child("Image").setValue(downloadUrl.toString());
-                            newPost.child("uid").setValue(mCurrentUser.getUid());
-                            newPost.child("username").setValue(dataSnapshot.child("name").getValue());
+                            final Post post = new Post(title,desc,downloadUrl.toString(),dataSnapshot.child("name").getValue().toString());
+
+
+                            dbLastPostIDRef.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    Integer lastPostID = dataSnapshot.getValue(Integer.class);
+                                    post.setPostID(lastPostID + 1);
+                                    databaseReference.child(""+post.getPostID()).setValue(post);
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
                         }
 
                         @Override

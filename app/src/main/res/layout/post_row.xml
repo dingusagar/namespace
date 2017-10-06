@@ -58,7 +58,31 @@
                 android:layout_height="wrap_content"
                 android:src="@mipmap/grey_like"
                 android:background="#00ffffff"
-                android:id="@+id/like_button" />
+                android:id="@+id/upvote" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/Text45"
+                android:text="up vote"
+                android:autoLink="web"
+                android:linksClickable="true"
+                android:padding="10dp" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="50dp"
+                android:src="@mipmap/grey_like"
+                android:background="#00ffffff"
+                android:id="@+id/downvote" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/Text456"
+                android:text="down vote"
+                android:autoLink="web"
+                android:linksClickable="true"
+                android:padding="10dp" />
         </LinearLayout>
 
 

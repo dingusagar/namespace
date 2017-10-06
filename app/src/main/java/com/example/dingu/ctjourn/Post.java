@@ -1,39 +1,46 @@
 package com.example.dingu.ctjourn;
 
 
+import java.util.HashMap;
 
 public class Post {
+
+    public Post(){}
+
+    public int getPostID() {
+        return postID;
+    }
+
+    public Post(String title, String desc, String video, String username) {
+        Title = title;
+        this.video = video;
+        Desc = desc;
+        this.username = username;
+    }
+
+    public void setPostID(int postID) {
+        this.postID = postID;
+    }
+
+    private int postID;
     private String Title;
     private String video;
     private String Desc;
 
-
-
-    private String username;
-
-    public Post()
-    {
-
+    public String getTitle() {
+        return Title;
     }
-    public Post(String title, String desc, String video,String userName) {
+
+    public void setTitle(String title) {
         Title = title;
-        Desc = desc;
-        video = video;
-        this.username = userName;
-    }
-    public String getUserName() {
-        return username;
     }
 
-    public void setUserName(String userName) {
-        this.username = userName;
-    }
     public String getVideo() {
         return video;
     }
 
-    public void setVideo(String image) {
-        video = video;
+    public void setVideo(String video) {
+        this.video = video;
     }
 
     public String getDesc() {
@@ -44,12 +51,24 @@ public class Post {
         Desc = desc;
     }
 
-    public String getTitle() {
+    private HashMap<String, Integer> votes;
+    private String username;
 
-        return Title;
+    public HashMap<String, Integer> getVotes() {
+        return votes;
     }
 
-    public void setTitle(String title) {
-        Title = title;
+    public void setVotes(HashMap<String, Integer> votes) {
+        this.votes = votes;
     }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+
 }
