@@ -4,9 +4,7 @@ import android.graphics.PorterDuff;
 import android.view.MotionEvent;
 import android.view.View;
 
-/**
- * Created by dingu on 29/4/17.
- */
+
 
 public class ButtonAnimator {
     public static void buttonEffect(View button){

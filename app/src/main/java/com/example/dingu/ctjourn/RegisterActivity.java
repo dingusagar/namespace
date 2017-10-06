@@ -31,11 +31,7 @@ public class RegisterActivity extends AppCompatActivity {
 
 
 
-    public enum UserMode{
-        STUDENT,FACULTY,INDUSTRIALIST
-    }
 
-    UserMode userMode ;
     boolean radioButtonChecked = false;
 
     @Override
@@ -77,7 +73,6 @@ public class RegisterActivity extends AppCompatActivity {
                         String userID = mAuth.getCurrentUser().getUid();
                         DatabaseReference currentUserDB = mdatabaseRefUsers.child(userID);
                         currentUserDB.child("name").setValue(name);
-                        currentUserDB.child("userMode").setValue(userMode);
                         currentUserDB.child("image").setValue("default");
                         progress.dismiss();
 
@@ -90,25 +85,6 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-    public void onProfileRadioButtonClicked (View view) {
-        // Is the button now checked?
-        radioButtonChecked = ((RadioButton) view).isChecked();
 
-        // Check which radio button was clicked
-        switch(view.getId()) {
-            case R.id.radio_student:
-                if (radioButtonChecked)
-                   userMode = UserMode.STUDENT;
-                    break;
-            case R.id.radio_faculty:
-                if (radioButtonChecked)
-                   userMode = UserMode.FACULTY;
-                    break;
-            case R.id.radio_industralist:
-                if (radioButtonChecked)
-                   userMode = UserMode.INDUSTRIALIST;
-                    break;
-        }
-    }
 
 }

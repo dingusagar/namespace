@@ -1,8 +1,6 @@
 package com.example.dingu.ctjourn;
 
-/**
- * Created by dingu on 1/4/17.
- */
+
 
 public class Post {
     private String Title;
