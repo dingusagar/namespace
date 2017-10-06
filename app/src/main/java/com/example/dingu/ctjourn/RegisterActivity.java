@@ -30,7 +30,7 @@ public class RegisterActivity extends AppCompatActivity {
     Button signUp;
 
 
-
+    private final int DEFAULT_REPUTATION = 10;
 
     boolean radioButtonChecked = false;
 
@@ -74,6 +74,7 @@ public class RegisterActivity extends AppCompatActivity {
                         DatabaseReference currentUserDB = mdatabaseRefUsers.child(userID);
                         currentUserDB.child("name").setValue(name);
                         currentUserDB.child("image").setValue("default");
+                        currentUserDB.child("reputation").setValue(DEFAULT_REPUTATION);
                         progress.dismiss();
 
                         Intent intent = new Intent(RegisterActivity.this,LoginActivity.class);
