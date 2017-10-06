@@ -2,6 +2,9 @@ package com.example.dingu.ctjourn;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -173,15 +176,26 @@ public class MainActivity extends AppCompatActivity {
         ImageButton downVoteButton;
         DatabaseReference mDatabaseRef;
         FirebaseAuth newAuth;
+         String videoURL=null;
         public PostViewHolder(View itemView) {
             super(itemView);
             mView = itemView;
+            ImageView thumbnail = (ImageView)mView.findViewById(R.id.post_image);
             upvoteButton =(ImageButton) mView.findViewById(R.id.upvote);
             downVoteButton = (ImageButton)mView.findViewById(R.id.downvote);
 
             mDatabaseRef = FirebaseDatabase.getInstance().getReference().child("Likes");
             newAuth = FirebaseAuth.getInstance();
             mDatabaseRef.keepSynced(true);
+            thumbnail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(mView.getContext(),videoPlayer.class);
+                    intent.putExtra("URL",videoURL);
+                    mView.getContext().startActivity(intent);
+
+                }
+            });
         }
 
         public void setTitle(String title)
@@ -200,6 +214,14 @@ public class MainActivity extends AppCompatActivity {
         {
             ImageView postImage = (ImageView)mView.findViewById(R.id.post_image);
 //            Picasso.with(context).load(image).into(postImage);
+            videoURL=image;
+            Bitmap bitmap = null;
+            try {
+                bitmap = retriveVideoFrameFromVideo(image);
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+            postImage.setImageBitmap(bitmap);
         }
 
         public void setUserName(String userName)
@@ -260,5 +282,36 @@ public class MainActivity extends AppCompatActivity {
             });
         }
     }
+    public static Bitmap retriveVideoFrameFromVideo(String videoPath)
+            throws Throwable
+    {
+        Bitmap bitmap = null;
+        MediaMetadataRetriever mediaMetadataRetriever = null;
+        try
+        {
+            mediaMetadataRetriever = new MediaMetadataRetriever();
+            if (Build.VERSION.SDK_INT >= 14)
+                mediaMetadataRetriever.setDataSource(videoPath, new HashMap<String, String>());
+            else
+                mediaMetadataRetriever.setDataSource(videoPath);
+            //   mediaMetadataRetriever.setDataSource(videoPath);
+            bitmap = mediaMetadataRetriever.getFrameAtTime();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            throw new Throwable(
+                    "Exception in retriveVideoFrameFromVideo(String videoPath)"
+                            + e.getMessage());
 
+        }
+        finally
+        {
+            if (mediaMetadataRetriever != null)
+            {
+                mediaMetadataRetriever.release();
+            }
+        }
+        return bitmap;
+    }
 }
