@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "310439074867",
+    "firebase_url": "https://ctjourn-85941.firebaseio.com",
+    "project_id": "ctjourn-85941",
+    "storage_bucket": "ctjourn-85941.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:310439074867:android:ffb6945b4d047379",
+        "android_client_info": {
+          "package_name": "com.example.dingu.ctjourn"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "310439074867-7tpd44oacostldlbgot45tc3kgdcncod.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.dingu.ctjourn",
+            "certificate_hash": "06fee18b9c319f8f059d36748f85f2230ba66085"
+          }
+        },
+        {
+          "client_id": "310439074867-c4l7qd3cje31npt5jhi9u8iq28nmmvk2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-GtePwoVzO-30MNCJ9pHhDsEu67GjjJA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "310439074867-c4l7qd3cje31npt5jhi9u8iq28nmmvk2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
