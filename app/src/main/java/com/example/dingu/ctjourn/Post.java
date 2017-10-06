@@ -4,7 +4,7 @@ package com.example.dingu.ctjourn;
 
 public class Post {
     private String Title;
-    private String Image;
+    private String video;
     private String Desc;
 
 
@@ -15,10 +15,10 @@ public class Post {
     {
 
     }
-    public Post(String title, String desc, String image, String userName) {
+    public Post(String title, String desc, String video,String userName) {
         Title = title;
         Desc = desc;
-        Image = image;
+        video = video;
         this.username = userName;
     }
     public String getUserName() {
@@ -28,12 +28,12 @@ public class Post {
     public void setUserName(String userName) {
         this.username = userName;
     }
-    public String getImage() {
-        return Image;
+    public String getVideo() {
+        return video;
     }
 
-    public void setImage(String image) {
-        Image = image;
+    public void setVideo(String image) {
+        video = video;
     }
 
     public String getDesc() {

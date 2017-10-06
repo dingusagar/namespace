@@ -1,16 +1,29 @@
 package com.example.dingu.ctjourn;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
-import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DecodeFormat;
+import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
+import com.bumptech.glide.load.resource.bitmap.FileDescriptorBitmapDecoder;
+import com.bumptech.glide.load.resource.bitmap.VideoBitmapDecoder;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -25,32 +38,34 @@ import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.File;
+import java.io.IOException;
+
+
 public class PostActivity extends AppCompatActivity {
 
     private static final int GALLERY_REQUEST =1;
-    private ImageButton postImageButton ;
+    private ImageView postVideoButton ;
+    private Glide glide;
     private EditText editTextTitle;
     private EditText editTextDesc;
     private Button butttonPost;
-    private Uri imageUri = null;
+    private  Uri videoUri = null;
     private ProgressDialog progressDialog;
-
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
     private StorageReference myStorageRef;
 
     private FirebaseAuth mAuth;
     private FirebaseUser mCurrentUser;
-
+    private static final int REQUEST_TAKE_GALLERY_VIDEO = 1;
     private DatabaseReference mDatabaseUser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
-
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser= mAuth.getCurrentUser();
-
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference().child("Post");
         mDatabaseUser = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrentUser.getUid());
@@ -69,13 +84,14 @@ public class PostActivity extends AppCompatActivity {
         });
 
 
-        postImageButton = (ImageButton) findViewById(R.id.addImage);
-        postImageButton.setOnClickListener(new View.OnClickListener() {
+        postVideoButton = (ImageView) findViewById(R.id.addVideo);
+        postVideoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent,GALLERY_REQUEST);
+                Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+                galleryIntent.setType("video/*");
+                startActivityForResult(galleryIntent,REQUEST_TAKE_GALLERY_VIDEO);
+
             }
         });
 
@@ -83,22 +99,11 @@ public class PostActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
+                videoUri= data.getData();
+                Glide.with(this).load(videoUri).into(postVideoButton);
 
-        if(requestCode == GALLERY_REQUEST && resultCode == RESULT_OK)
-        {
-             imageUri = data.getData();
-            CropImage.activity(imageUri).setGuidelines(CropImageView.Guidelines.ON).start(this);
-
-        }
-
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            if (resultCode == RESULT_OK) {
-                Uri resultUri = result.getUri();
-                postImageButton.setImageURI(resultUri);
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Exception error = result.getError();
             }
         }
 
@@ -107,18 +112,17 @@ public class PostActivity extends AppCompatActivity {
     private void startPosting()
     {
         progressDialog.setMessage("Posting");
-
         final String title = editTextTitle.getText().toString().trim();
         final String desc = editTextDesc.getText().toString().trim();
 
-        if(!TextUtils.isEmpty(title) && !TextUtils.isEmpty(desc) && imageUri!=null)
+        if(!TextUtils.isEmpty(title) && !TextUtils.isEmpty(desc) && videoUri!=null)
         {
             progressDialog.show();
-            StorageReference filepath = myStorageRef.child("Project_Images").child(imageUri.getLastPathSegment());
-            filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            StorageReference filepath = myStorageRef.child("Project_Images").child(videoUri.getLastPathSegment());
+            filepath.putFile(videoUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                   final Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                    final Uri downloadUrl = taskSnapshot.getDownloadUrl();
                     final DatabaseReference newPost = databaseReference.push();
 
 
@@ -145,4 +149,7 @@ public class PostActivity extends AppCompatActivity {
         }
 
     }
+
+
 }
+

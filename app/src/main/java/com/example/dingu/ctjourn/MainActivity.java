@@ -23,7 +23,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -90,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
                 viewHolder.setTitle(model.getTitle());
                 viewHolder.setDesc(model.getDesc());
-                viewHolder.setImage(getApplicationContext(),model.getImage());
+                viewHolder.setImage(getApplicationContext(),model.getVideo());
                 viewHolder.setUserName(model.getUserName());
                 viewHolder.setLikeButton(postKey);
 
@@ -202,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
         public void setImage(Context context, String image)
         {
             ImageView postImage = (ImageView)mView.findViewById(R.id.post_image);
-            Picasso.with(context).load(image).into(postImage);
+//            Picasso.with(context).load(image).into(postImage);
         }
 
         public void setUserName(String userName)

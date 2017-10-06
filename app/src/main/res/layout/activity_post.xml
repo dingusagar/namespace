@@ -5,15 +5,14 @@
     android:id="@+id/activity_post"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
-    tools:context="com.example.dingu.myblogapp.PostActivity">
+    tools:context="com.example.dingu.ctjourn.PostActivity">
 
 
 
 
     <Button
         android:text="Post"
-       android:background="@color/colorPrimary"
+        android:background="@color/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -29,7 +28,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/addImage"
+        android:id="@+id/addVideo"
         android:adjustViewBounds="true" />
 
     <EditText
@@ -41,7 +40,7 @@
         android:padding="8dp"
         android:layout_margin="4dp"
         android:ems="10"
-        android:layout_below="@+id/addImage"
+        android:layout_below="@+id/addVideo"
         android:id="@+id/titleText"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
