@@ -138,12 +138,13 @@ public class PostActivity extends AppCompatActivity {
                             final Post post = new Post(title,desc,downloadUrl.toString(),dataSnapshot.child("name").getValue().toString());
 
 
-                            dbLastPostIDRef.addValueEventListener(new ValueEventListener() {
+                            dbLastPostIDRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     Integer lastPostID = dataSnapshot.getValue(Integer.class);
                                     post.setPostID(lastPostID + 1);
                                     databaseReference.child(""+post.getPostID()).setValue(post);
+                                    dbLastPostIDRef.setValue(post.getPostID());
 
                                 }
 

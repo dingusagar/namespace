@@ -1,6 +1,8 @@
 package com.example.dingu.ctjourn;
 
 
+import android.content.Context;
+
 import java.util.HashMap;
 
 public class Post {
@@ -26,6 +28,8 @@ public class Post {
     private String Title;
     private String video;
     private String Desc;
+    private Double latitude,longitude;
+
 
     public String getTitle() {
         return Title;
@@ -51,7 +55,7 @@ public class Post {
         Desc = desc;
     }
 
-    private HashMap<String, Integer> votes;
+    private HashMap<String, Integer> votes = new HashMap<>();
     private String username;
 
     public HashMap<String, Integer> getVotes() {
@@ -68,6 +72,11 @@ public class Post {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void setGPSCoordinates(Context context)
+    {
+
     }
 
 

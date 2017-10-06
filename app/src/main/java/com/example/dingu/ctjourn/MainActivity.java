@@ -100,22 +100,27 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         HashMap<String,Integer> votes = model.getVotes();
-
-                        if(v.getId() == R.id.upvote)
+                        if(mAuth.getCurrentUser() != null)
                         {
-                            votes.put(mAuth.getCurrentUser().getUid().toString(),1);
-                            model.setVotes(votes);
-                            myDBRef.child(""+model.getPostID()).setValue(model);
-                        }else if(v.getId() == R.id.downvote)
-                        {
-                            votes.put(mAuth.getCurrentUser().getUid().toString(),-1);
-                            model.setVotes(votes);
-                            myDBRef.child(""+model.getPostID()).setValue(model);
+                            String uid = mAuth.getCurrentUser().getUid().toString();
+                            if(v.getId() == R.id.upvote)
+                            {
+                                votes.put(uid,1);
+                                model.setVotes(votes);
+                                myDBRef.child(""+model.getPostID()).setValue(model);
+                            }else if(v.getId() == R.id.downvote)
+                            {
+                                votes.put(uid,-1);
+                                model.setVotes(votes);
+                                myDBRef.child(""+model.getPostID()).setValue(model);
+                            }
                         }
+
                     }
                 };
 
                 viewHolder.upvoteButton.setOnClickListener(listener);
+                viewHolder.downVoteButton.setOnClickListener(listener);
             }
         };
         postList.setAdapter(firebaseRecyclerAdapter);

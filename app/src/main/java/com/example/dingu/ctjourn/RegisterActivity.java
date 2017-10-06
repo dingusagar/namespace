@@ -61,7 +61,7 @@ public class RegisterActivity extends AppCompatActivity {
         String email = emailField.getText().toString().trim();
         String password = passwordField.getText().toString().trim();
 
-        if(!TextUtils.isEmpty(name) && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password) && radioButtonChecked)
+        if(!TextUtils.isEmpty(name) && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password) )
         {
             progress.setMessage("Signing up..");
             progress.show();
@@ -73,7 +73,6 @@ public class RegisterActivity extends AppCompatActivity {
                         String userID = mAuth.getCurrentUser().getUid();
                         DatabaseReference currentUserDB = mdatabaseRefUsers.child(userID);
                         currentUserDB.child("name").setValue(name);
-                        currentUserDB.child("image").setValue("default");
                         currentUserDB.child("reputation").setValue(DEFAULT_REPUTATION);
                         progress.dismiss();
 
