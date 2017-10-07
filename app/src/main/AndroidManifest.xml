@@ -23,6 +23,7 @@
             android:theme="@style/Base.Theme.AppCompat" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity" ></activity>
+        <activity android:name=".videoPlayer" ></activity>
     </application>
 
 </manifest>

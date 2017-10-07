@@ -61,6 +61,7 @@ public class PostActivity extends AppCompatActivity {
     private static final int REQUEST_TAKE_GALLERY_VIDEO = 1;
     private DatabaseReference mDatabaseUser,dbLastPostIDRef;
 
+    private float lati,longi;
 
 
 
@@ -101,6 +102,15 @@ public class PostActivity extends AppCompatActivity {
             }
         });
 
+        SingleShotLocationProvider.requestSingleUpdate(this,new SingleShotLocationProvider.LocationCallback() {
+            @Override
+            public void onNewLocationAvailable(SingleShotLocationProvider.GPSCoordinates location) {
+                lati  = location.latitude;
+                longi = location.longitude;
+                Log.d("Location", "my location is " + location.toString());
+            }
+        });
+
     }
 
     @Override
@@ -136,7 +146,8 @@ public class PostActivity extends AppCompatActivity {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             final Post post = new Post(title,desc,downloadUrl.toString(),dataSnapshot.child("name").getValue().toString());
-
+                            post.setLatitude(lati);
+                            post.setLongitude(longi);
 
                             dbLastPostIDRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override

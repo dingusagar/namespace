@@ -11,10 +11,10 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     private boolean mProcessLike = false;
+    private float lati,longi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +74,15 @@ public class MainActivity extends AppCompatActivity {
         postList = (RecyclerView)findViewById(R.id.post_list);
         postList.setHasFixedSize(true);
         postList.setLayoutManager(new LinearLayoutManager(this));
+
+        SingleShotLocationProvider.requestSingleUpdate(this,new SingleShotLocationProvider.LocationCallback() {
+            @Override
+            public void onNewLocationAvailable(SingleShotLocationProvider.GPSCoordinates location) {
+                lati  = location.latitude;
+                longi = location.longitude;
+                Log.d("Location", "my location is " + location.toString());
+            }
+        });
 
     }
 
@@ -111,12 +121,18 @@ public class MainActivity extends AppCompatActivity {
                                 votes.put(uid,1);
                                 model.setVotes(votes);
                                 myDBRef.child(""+model.getPostID()).setValue(model);
+                                Toast.makeText(getApplicationContext(),"Up voted !!",Toast.LENGTH_SHORT).show();
                             }else if(v.getId() == R.id.downvote)
                             {
                                 votes.put(uid,-1);
                                 model.setVotes(votes);
                                 myDBRef.child(""+model.getPostID()).setValue(model);
+                                Toast.makeText(getApplicationContext(),"Down voted !!",Toast.LENGTH_SHORT).show();
+
                             }
+
+                            mDatabaseUsers.child(uid).child("lastLatitude").setValue(lati);
+                            mDatabaseUsers.child(uid).child("lastLongitude").setValue(longi);
                         }
 
                     }
@@ -214,14 +230,10 @@ public class MainActivity extends AppCompatActivity {
         {
             ImageView postImage = (ImageView)mView.findViewById(R.id.post_image);
 //            Picasso.with(context).load(image).into(postImage);
-            videoURL=image;
-            Bitmap bitmap = null;
-            try {
-                bitmap = retriveVideoFrameFromVideo(image);
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
-            }
-            postImage.setImageBitmap(bitmap);
+            videoURL = image;
+            ImageLoadingAsynTask mytask = new ImageLoadingAsynTask(videoURL,postImage );
+            mytask.execute();
+
         }
 
         public void setUserName(String userName)
@@ -256,62 +268,31 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        public void setDownVoteButton(final String postKey)
-        {
-            mDatabaseRef.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    boolean userLoggedIn ;
-                    if (newAuth.getCurrentUser() != null) {
-                        if(dataSnapshot.child(postKey).hasChild(newAuth.getCurrentUser().getUid()))
-                        {
-                            downVoteButton.setImageResource(R.mipmap.blue_like);
-                        }
-                        else
-                        {
-                            downVoteButton.setImageResource(R.mipmap.grey_like);
-                        }
-                    }
-
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }
+//        public void setDownVoteButton(final String postKey)
+//        {
+//            mDatabaseRef.addValueEventListener(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(DataSnapshot dataSnapshot) {
+//                    boolean userLoggedIn ;
+//                    if (newAuth.getCurrentUser() != null) {
+//                        if(dataSnapshot.child(postKey).hasChild(newAuth.getCurrentUser().getUid()))
+//                        {
+//                            downVoteButton.setImageResource(R.mipmap.blue_like);
+//                        }
+//                        else
+//                        {
+//                            downVoteButton.setImageResource(R.mipmap.grey_like);
+//                        }
+//                    }
+//
+//                }
+//
+//                @Override
+//                public void onCancelled(DatabaseError databaseError) {
+//
+//                }
+//            });
+//        }
     }
-    public static Bitmap retriveVideoFrameFromVideo(String videoPath)
-            throws Throwable
-    {
-        Bitmap bitmap = null;
-        MediaMetadataRetriever mediaMetadataRetriever = null;
-        try
-        {
-            mediaMetadataRetriever = new MediaMetadataRetriever();
-            if (Build.VERSION.SDK_INT >= 14)
-                mediaMetadataRetriever.setDataSource(videoPath, new HashMap<String, String>());
-            else
-                mediaMetadataRetriever.setDataSource(videoPath);
-            //   mediaMetadataRetriever.setDataSource(videoPath);
-            bitmap = mediaMetadataRetriever.getFrameAtTime();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            throw new Throwable(
-                    "Exception in retriveVideoFrameFromVideo(String videoPath)"
-                            + e.getMessage());
 
-        }
-        finally
-        {
-            if (mediaMetadataRetriever != null)
-            {
-                mediaMetadataRetriever.release();
-            }
-        }
-        return bitmap;
-    }
 }
