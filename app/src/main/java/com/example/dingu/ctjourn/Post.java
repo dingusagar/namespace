@@ -30,6 +30,15 @@ public class Post {
     private String video;
     private String Desc;
     private double latitude;
+    private float rating;
+
+    public float getRating() {
+        return rating;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
+    }
 
     public double getLatitude() {
         return latitude;

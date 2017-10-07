@@ -2,12 +2,17 @@ package com.example.dingu.ctjourn;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -74,15 +79,36 @@ public class MainActivity extends AppCompatActivity {
         postList = (RecyclerView)findViewById(R.id.post_list);
         postList.setHasFixedSize(true);
         postList.setLayoutManager(new LinearLayoutManager(this));
-
-        SingleShotLocationProvider.requestSingleUpdate(this,new SingleShotLocationProvider.LocationCallback() {
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        LocationListener locationListener = new LocationListener() {
             @Override
-            public void onNewLocationAvailable(SingleShotLocationProvider.GPSCoordinates location) {
-                lati  = location.latitude;
-                longi = location.longitude;
-                Log.d("Location", "my location is " + location.toString());
+            public void onLocationChanged(Location location) {
+                if (location != null) {
+                    lati = (float) location.getLatitude();
+                    longi = (float) location.getLongitude();
+                }
             }
-        });
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+
+            }
+
+        };
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
     }
 
@@ -122,13 +148,14 @@ public class MainActivity extends AppCompatActivity {
                                 model.setVotes(votes);
                                 myDBRef.child(""+model.getPostID()).setValue(model);
                                 Toast.makeText(getApplicationContext(),"Up voted !!",Toast.LENGTH_SHORT).show();
+                                changeRating(model,votes.get(uid));
                             }else if(v.getId() == R.id.downvote)
                             {
                                 votes.put(uid,-1);
                                 model.setVotes(votes);
                                 myDBRef.child(""+model.getPostID()).setValue(model);
                                 Toast.makeText(getApplicationContext(),"Down voted !!",Toast.LENGTH_SHORT).show();
-
+                                changeRating(model,votes.get(uid));
                             }
 
                             mDatabaseUsers.child(uid).child("lastLatitude").setValue(lati);
@@ -293,6 +320,21 @@ public class MainActivity extends AppCompatActivity {
 //                }
 //            });
 //        }
+    }
+    private  void changeRating(final Post post, final int value){
+        mDatabaseUsers.child(mAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                long reputation = (long)dataSnapshot.child("reputation").getValue();
+                    post.setRating(post.getRating()+value*reputation);
+                myDBRef.child(""+post.getPostID()).setValue(post);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
 }
